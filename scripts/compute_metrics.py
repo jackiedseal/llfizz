@@ -42,8 +42,7 @@ def main():
     featurizer = Featurizer(featurizer)
 
     feature_vectors = FeatureVector.load(args.input_file)
-    feature_vectors = tqdm.tqdm(feature_vectors, desc="computing mean + var")
-    _, mean, variance = FeatureVector.cmv(feature_vectors)
+    mean, variance = FeatureVector.get_mean_and_var(feature_vectors)
     weights = variance.map_values(lambda x: 1 / math.sqrt(x) if x > 0 else 0)
     Metric(mean, weights).dump(args.output_file)
 
