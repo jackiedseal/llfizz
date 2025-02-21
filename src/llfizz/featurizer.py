@@ -177,7 +177,21 @@ class FeatureVector:
             self.seqid, self.features["name"], func(self.features["value"])
         )
 
-    # TODO: Add cmv functions.
+    @staticmethod
+    def get_mean_and_var(feature_vectors: typing.List["FeatureVector"]) -> typing.Tuple["FeatureVector", "FeatureVector", "FeatureVector"]:
+        """
+        Returns a mean and variance  tuple from the iterable of feature vectors.
+
+        Variance is population variance (i.e. uses `N` instead of `N-1` in the denominator.)
+        """
+        assert len(feature_vectors) > 0, "No feature vectors to compute cmv from."
+
+        featnames = feature_vectors[0].features["name"]
+        mean_feature_vector = FeatureVector("mean", featnames, np.mean([fv.features["value"] for fv in feature_vectors], axis=0))
+        var_feature_vector = FeatureVector("variance", featnames, np.var([fv.features["value"] for fv in feature_vectors], axis=0))
+
+        return mean_feature_vector, var_feature_vector
+
 
 
 class Featurizer:
