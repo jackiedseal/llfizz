@@ -6,6 +6,7 @@ like `native-features.json` in the same directory.
 
 See `compile_native_feature` for the format of configuration.
 """
+
 import re
 import typing
 
@@ -26,15 +27,16 @@ __all__ = [
     "simple_spacing_closure",
     "custom_kappa_closure",
     "complexity",
-    "isoelectric_point"
+    "isoelectric_point",
 ]
 
-def compile_native_featurizer(features_dict = None):
+
+def compile_native_featurizer(features_dict=None):
     """
     Given a nested-dict object like `native-features.json` in this directory,
     make a dictionary of names to feature functions.
-    
-    If no dictionary is provided, `native-features.json` is used. 
+
+    If no dictionary is provided, `native-features.json` is used.
 
     Layout
     ------
@@ -54,7 +56,7 @@ def compile_native_featurizer(features_dict = None):
     special residue groups. (e.g. "charged" residues might be represented as {"charged": "DEKR"})
     These residue groups are required for computing `simple_spacing` and `percent_res_group`
     features (see `compile_native_feature`).
-    
+
     The "motif_frequencies" section is an (optional) dict of motifs to their expected count per length.
     See `count_pattern_matches_minus_expected`.
 
@@ -63,7 +65,7 @@ def compile_native_featurizer(features_dict = None):
     """
     if features_dict is None:
         with open(os.path.join(DATA_DIRECTORY, "native-features.json"), "r") as file:
-            features_dict = json.load(file) 
+            features_dict = json.load(file)
     features = features_dict["features"]
     residue_groups = features_dict.get("residue_groups") or {}
     motif_frequencies = features_dict.get("motif_frequencies") or {}
@@ -72,19 +74,25 @@ def compile_native_featurizer(features_dict = None):
     errors = {}
     for featname, feature_params in features.items():
         try:
-            return_value[featname] = compile_native_feature(residue_groups=residue_groups, motif_frequencies=motif_frequencies, residue_frequencies=residue_frequencies, **feature_params)
+            return_value[featname] = compile_native_feature(
+                residue_groups=residue_groups,
+                motif_frequencies=motif_frequencies,
+                residue_frequencies=residue_frequencies,
+                **feature_params,
+            )
         except (ValueError, TypeError) as e:
             errors[featname] = e
     return return_value, errors
 
+
 def compile_native_feature(
-    *, 
-    compute: str, 
-    residue_groups: typing.Dict[str, str], 
+    *,
+    compute: str,
+    residue_groups: typing.Dict[str, str],
     motif_frequencies: typing.Dict[str, float],
     residue_frequencies: typing.Optional[typing.Dict[str, float]],
-    **kwargs
-    ):
+    **kwargs,
+):
     """
     Turn the provided kwargs into one sequence to feature function.
 
@@ -110,7 +118,7 @@ def compile_native_feature(
     - "isoelectric_point"
 
     The necessary keyword arguments by computation type are:
-    
+
     `compute="score"`
     score : dict[str, float]
         A dictionary with numeric scores (values) for each motif/residue (keys).
@@ -126,16 +134,16 @@ def compile_native_feature(
         If true, search the `motif_frequencies` for the expected count / length of this motif.
         Will raise if this value is true but no such expected value can be found.
         Uses the expected frequency in the `count_pattern_matches_minus_expected` function.
-    
+
     `compute="percent_residue"`
     residue : str
         A single amino acid to get the composition of.
-    
+
     `compute="percent_res_group"`
     residue_group : str
         The name of a residue group in the provided `residue_groups` dict.
         Raises if such a group is not present.
-    
+
     `compute="span"`
     pattern : str
         The regex pattern to get the span of.
@@ -148,13 +156,13 @@ def compile_native_feature(
         If true, uses `aa_frequencies` (which must not be None) to produce an
         expected number of repeat occurrences for each length.
         See `repeats_minus_expected`.
-    
+
     `compute="log_ratio"`
     numerator : str
         Single amino acid. Positively correlated with feature value.
     denominator : str
         Single amino acid. Negatively correlated with feature value.
-    
+
     `compute="simple_spacing"`
     residue_group : str
         The name of a residue group in the provided `residue_groups` dict.
@@ -165,17 +173,21 @@ def compile_native_feature(
     """
     if compute == "score":
         if (score := kwargs.get("score")) is None:
-            raise ValueError("`compute=score` requires a `score` parameter (see `score_pattern_matches`)")
+            raise ValueError(
+                "`compute=score` requires a `score` parameter (see `score_pattern_matches`)"
+            )
         average = kwargs.get("take_average") or kwargs.get("average") or False
         if not isinstance(average, bool):
             raise TypeError("expected `average` to be True or False")
         if not isinstance(score, dict):
             raise TypeError("expected `score` to be a dict of residue->score pairs")
         return partial(score_pattern_matches, score=score, average=average)
-    
+
     if compute == "count":
         if (pattern := kwargs.get("pattern")) is None:
-            raise ValueError("`compute=count` requires a `pattern` parameter (see `count_pattern_matches`)")
+            raise ValueError(
+                "`compute=count` requires a `pattern` parameter (see `count_pattern_matches`)"
+            )
         average = kwargs.get("take_average") or kwargs.get("average") or False
         if not isinstance(pattern, str):
             raise TypeError("expected `pattern` to be a regex pattern")
@@ -183,80 +195,127 @@ def compile_native_feature(
             raise TypeError("expected `average` to be True or False")
         if kwargs.get("subtract_expected"):
             if (pattern_frequency := motif_frequencies.get(pattern)) is None:
-                raise ValueError("`subtract_expected` was set but no motif frequency for `%s` is available" % pattern)
+                raise ValueError(
+                    "`subtract_expected` was set but no motif frequency for `%s` is available"
+                    % pattern
+                )
             if not isinstance(pattern_frequency, float):
-                raise TypeError("expected motif frequency for `%s` to be a number" % pattern)
-            return partial(count_pattern_matches_minus_expected, pattern=re.compile(pattern), pattern_frequency=pattern_frequency, average=average)
-        return partial(count_pattern_matches, pattern=re.compile(pattern), average=average)
-    
+                raise TypeError(
+                    "expected motif frequency for `%s` to be a number" % pattern
+                )
+            return partial(
+                count_pattern_matches_minus_expected,
+                pattern=re.compile(pattern),
+                pattern_frequency=pattern_frequency,
+                average=average,
+            )
+        return partial(
+            count_pattern_matches, pattern=re.compile(pattern), average=average
+        )
+
     if compute == "percent_residue":
         if (residue := kwargs.get("residue")) is None:
-            raise ValueError("`compute=percent_residue` requires a residue as the `residue` parameter")
+            raise ValueError(
+                "`compute=percent_residue` requires a residue as the `residue` parameter"
+            )
         if not isinstance(residue, str) and len(residue) == 1:
             raise TypeError("expected `residue` to be a single amino acid")
         return partial(count_pattern_matches, pattern=re.compile(residue), average=True)
-    
+
     if compute == "percent_res_group":
         if (res_group_name := kwargs.get("residue_group")) is None:
-            raise ValueError("`compute=percent_res_group` requires the name of a residue group as the `residue_group` parameter")
+            raise ValueError(
+                "`compute=percent_res_group` requires the name of a residue group as the `residue_group` parameter"
+            )
         if (res_group := residue_groups.get(res_group_name)) is None:
-            raise ValueError("unknown residue group %s - available are: %s" % (res_group_name, ",".join(residue_groups.keys())))
+            raise ValueError(
+                "unknown residue group %s - available are: %s"
+                % (res_group_name, ",".join(residue_groups.keys()))
+            )
         if isinstance(res_group, list):
             res_group = "".join(res_group)
         if not isinstance(res_group, str):
-            raise TypeError("expected residue group %s to be a list or string of amino acids" % res_group_name)
-        return partial(count_pattern_matches, pattern=re.compile("[%s]" % res_group), average=True)
-    
+            raise TypeError(
+                "expected residue group %s to be a list or string of amino acids"
+                % res_group_name
+            )
+        return partial(
+            count_pattern_matches, pattern=re.compile("[%s]" % res_group), average=True
+        )
+
     if compute == "span":
         if (pattern := kwargs.get("pattern")) is None:
-            raise ValueError("`compute=span` requires a `pattern` parameter (see `pattern_match_span`)")
+            raise ValueError(
+                "`compute=span` requires a `pattern` parameter (see `pattern_match_span`)"
+            )
         return partial(pattern_match_span, pattern=re.compile(pattern))
-    
+
     if compute == "repeats":
         if (residues := kwargs.get("residues")) is None:
-            raise ValueError("`compute=repeats` requires the residues in the repeat as the `residues` parameter")
+            raise ValueError(
+                "`compute=repeats` requires the residues in the repeat as the `residues` parameter"
+            )
         if isinstance(residues, list):
             residues = "".join(residues)
         if not isinstance(residues, str):
             raise TypeError("expected `residues` to be a list or string of amino acids")
         if kwargs.get("subtract_expected"):
             if residue_frequencies is None:
-                raise ValueError("`subtract_expected` was set but no residue frequencies are available")
+                raise ValueError(
+                    "`subtract_expected` was set but no residue frequencies are available"
+                )
             residue_frequency = sum(residue_frequencies.get(aa, 0) for aa in residues)
-            return partial(repeats_minus_expected, repeat_pattern=re.compile("[%s]" % residues), residue_frequency=residue_frequency)
+            return partial(
+                repeats_minus_expected,
+                repeat_pattern=re.compile("[%s]" % residues),
+                residue_frequency=residue_frequency,
+            )
         return partial(pattern_match_span, pattern=re.compile("[%s]" % residues))
 
     if compute == "log_ratio":
         if (num_aa := kwargs.get("numerator")) is None:
-            raise ValueError("`compute=log_ratio` requires a `numerator` parameter (see `log_ratio`)") 
+            raise ValueError(
+                "`compute=log_ratio` requires a `numerator` parameter (see `log_ratio`)"
+            )
         if (denom_aa := kwargs.get("denominator")) is None:
-            raise ValueError("`compute=log_ratio` requires a `denominator` parameter (see `log_ratio`)")
+            raise ValueError(
+                "`compute=log_ratio` requires a `denominator` parameter (see `log_ratio`)"
+            )
         return partial(log_ratio, num_aa=num_aa, denom_aa=denom_aa)
-    
+
     if compute == "scd":
         return scd
-    
+
     if compute == "simple_spacing":
         if (res_group_name := kwargs.get("residue_group")) is None:
-            raise ValueError("`compute=simple_spacing` requires the name of a residue group as the `residue_group` parameter")
+            raise ValueError(
+                "`compute=simple_spacing` requires the name of a residue group as the `residue_group` parameter"
+            )
         if (res_group := residue_groups.get(res_group_name)) is None:
-            raise ValueError("unknown residue group %s - available are: %s" % (res_group_name, ",".join(residue_groups.keys())))
+            raise ValueError(
+                "unknown residue group %s - available are: %s"
+                % (res_group_name, ",".join(residue_groups.keys()))
+            )
         if isinstance(res_group, list):
             res_group = "".join(res_group)
         if not isinstance(res_group, str):
-            raise TypeError("expected residue group %s to be a list or string of amino acids" % res_group_name)
+            raise TypeError(
+                "expected residue group %s to be a list or string of amino acids"
+                % res_group_name
+            )
         return simple_spacing_closure(res_group, res_group_name)
-    
+
     if compute == "custom_kappa":
         return custom_kappa_closure()
 
     if compute == "complexity" or compute == "sequence_complexity":
         return complexity
-    
+
     if compute == "isoelectric_point":
         return isoelectric_point
-    
+
     raise ValueError("not a recognized compute option: %s" % compute)
+
 
 def score_pattern_matches(
     sequence: str,
@@ -282,12 +341,11 @@ def score_pattern_matches(
     ------
     If `average` is ``True`` and the provided sequence is empty.
     """
-    result = sum(
-        score * len(re.findall(pat, sequence)) for pat, score in score.items()
-    )
+    result = sum(score * len(re.findall(pat, sequence)) for pat, score in score.items())
     if average:
         return result / len(sequence)
     return result
+
 
 def count_pattern_matches(
     sequence: str,
@@ -315,6 +373,7 @@ def count_pattern_matches(
     if average:
         return result / len(sequence)
     return result
+
 
 def count_pattern_matches_minus_expected(
     sequence: str,
@@ -350,6 +409,7 @@ def count_pattern_matches_minus_expected(
         return result / len(sequence)
     return result
 
+
 def pattern_match_span(
     sequence: str,
     pattern: re.Pattern[str],
@@ -366,13 +426,13 @@ def pattern_match_span(
         The regex pattern to determine the length of.
     """
     return sum(
-        right - left for left, right in map(re.Match.span, re.finditer(pattern, sequence))
+        right - left
+        for left, right in map(re.Match.span, re.finditer(pattern, sequence))
     )
 
+
 def repeats_minus_expected(
-    sequence: str,
-    repeat_pattern: re.Pattern[str],
-    residue_frequency: float
+    sequence: str, repeat_pattern: re.Pattern[str], residue_frequency: float
 ) -> float:
     """Calculate the total length spanned by patterns in a target sequence.
 
@@ -399,7 +459,7 @@ def repeats_minus_expected(
         Case 2
         v
     XXXXXXXXXXX
-    ^         ^  
+    ^         ^
     Case 1    Case 3
     ```
 
@@ -423,13 +483,19 @@ def repeats_minus_expected(
     P^2 (2 x (L-1) - (L-2) x P)
     ```
     """
-    expected_span = residue_frequency \
-                    * residue_frequency \
-                    * ((2 * (len(sequence) - 1))
-                        - ((len(sequence) - 2) * residue_frequency))
-    return sum(
-        right - left for left, right in map(re.Match.span, re.finditer(repeat_pattern, sequence))
-    ) - expected_span 
+    expected_span = (
+        residue_frequency
+        * residue_frequency
+        * ((2 * (len(sequence) - 1)) - ((len(sequence) - 2) * residue_frequency))
+    )
+    return (
+        sum(
+            right - left
+            for left, right in map(re.Match.span, re.finditer(repeat_pattern, sequence))
+        )
+        - expected_span
+    )
+
 
 def log_ratio(
     sequence: str,
@@ -437,6 +503,7 @@ def log_ratio(
     denom_aa: str,
 ) -> float:
     from math import log
+
     """Calculate ``log(1 + num_aa) - log(1 - denom_aa)`` for in a sequence.
 
     Uses natural log.
@@ -454,6 +521,7 @@ def log_ratio(
     """
     return log((1 + sequence.count(num_aa)) / (1 + sequence.count(denom_aa)))
 
+
 def scd(sequence: str) -> float:
     """
     Calculate the `SCD`_ (Sequence Charge Decoration) of a sequence.
@@ -466,6 +534,7 @@ def scd(sequence: str) -> float:
         Target sequence on which to determine the SCD.
     """
     from math import sqrt
+
     BINARY_CHARGE = {"D": -1, "E": -1, "K": 1, "R": 1}
     charged_res = []
     for i, aa in enumerate(sequence):
@@ -483,14 +552,13 @@ def scd(sequence: str) -> float:
             )
     return result / len(sequence)
 
+
 def abstract_spacing_calculation(
     *,
     sequence: str,
     candidates: typing.List[int],
     are_neighbours: typing.Callable[[str, str], bool],
-    prob_neighbor_given_candidate: typing.Callable[
-        [str, typing.List[int], int], float
-    ],
+    prob_neighbor_given_candidate: typing.Callable[[str, typing.List[int], int], float],
     not_enough_candidates_error: str,
     blob: int,
 ) -> float:
@@ -505,10 +573,11 @@ def abstract_spacing_calculation(
     The resulting number is a measure of how often close-neighbour residue
     pairs occur compared to how often they are expected to occur via
     composition.
-            
+
     This function is not publically exposed as a `*` import.
     """
     from math import sqrt
+
     def count_neighbors():
         """The number of `neighbour` residues."""
         candidate_pairs = list(zip(candidates[:-1], candidates[1:]))
@@ -519,10 +588,9 @@ def abstract_spacing_calculation(
             for i, j in candidate_pairs
             if are_neighbours(sequence[i], sequence[j]) and (abs(i - j) <= blob)
         )
+
     actual_neighbors = count_neighbors()
-    p: float = prob_neighbor_given_candidate(
-        sequence, candidates, blob
-    )
+    p: float = prob_neighbor_given_candidate(sequence, candidates, blob)
     mean_neighbors: float = p * len(candidates)
     sd_neighbors: float = sqrt(p * (1 - p) * len(candidates))
     return (actual_neighbors - mean_neighbors) / sd_neighbors
@@ -536,7 +604,7 @@ def simple_spacing_closure(
 ):
     """
     Set up a closure to compute simple spacing for this residue group.
-    
+
     In a simple spacing computation, the residues in a certain residue group (e.g.
     the charged residues, the aromatic residues, etc.) are considered to be
     `candidate` residues. The pairs of candidate residues within 5 residues of each
@@ -545,6 +613,7 @@ def simple_spacing_closure(
     This closure therefore measures how "clustered" the residues from this residue
     group are distributed in the sequence.
     """
+
     def prob_neighbor_given_candidate(
         sequence: str,
         candidates: typing.List[int],
@@ -553,13 +622,19 @@ def simple_spacing_closure(
         proportion_candidates: float = len(candidates) / len(sequence)
         # It shouldn't be zero either, but that should be caught already.
         if proportion_candidates == 1:
-            raise ValueError("cannot compute %s spacing on sequence with only %s residues" % (res_group_name, res_group_name))
+            raise ValueError(
+                "cannot compute %s spacing on sequence with only %s residues"
+                % (res_group_name, res_group_name)
+            )
         return proportion_candidates * sum(
             (1 - proportion_candidates) ** i for i in range(blob)
         )
+
     def are_neighbours(_a: str, _b: str):
         return True
+
     not_enough_candidates_error = "sequence has no %s residues" % res_group_name
+
     def simple_spacing(sequence: str):
         candidates = []
         for i, aa in enumerate(sequence):
@@ -571,8 +646,9 @@ def simple_spacing_closure(
             are_neighbours=are_neighbours,
             prob_neighbor_given_candidate=prob_neighbor_given_candidate,
             not_enough_candidates_error=not_enough_candidates_error,
-            blob=blob
+            blob=blob,
         )
+
     return simple_spacing
 
 
@@ -582,13 +658,14 @@ def custom_kappa_closure(
 ):
     """
     Set up a closure to compute a kappa-like measure for this residue group.
-    
+
     In this custom-kappa computation, charged residues are candidates, and the pairs of
     same-charge residues within 5 residues of each other are the `neighbour` residues.
 
     This closure therefore measures how similar/blocky charges residues are.
     """
-    BINARY_CHARGE = {"D": -1, "E": -1, "K": 1, "R": 1} 
+    BINARY_CHARGE = {"D": -1, "E": -1, "K": 1, "R": 1}
+
     def prob_neighbor_given_candidate(
         sequence: str,
         candidates: typing.List[int],
@@ -601,14 +678,19 @@ def custom_kappa_closure(
             2 * (count_pos) * (count_neg) / (len(candidates) ** 2)
         )
         if proportion_candidates == 1 and prob_charges_are_diff == 0:
-            raise ValueError("cannot compute charge spacing, `custom_kappa` cannot deal with all residues of one charge")
+            raise ValueError(
+                "cannot compute charge spacing, `custom_kappa` cannot deal with all residues of one charge"
+            )
         prob_next_charge_in_blob: float = proportion_candidates * sum(
             (1 - proportion_candidates) ** i for i in range(blob)
         )
         return prob_next_charge_in_blob * (1 - prob_charges_are_diff)
+
     def are_neighbours(res_a: str, res_b: str):
         return BINARY_CHARGE[res_a] == BINARY_CHARGE[res_b]
+
     not_enough_candidates_error = "sequence has no charged residues"
+
     def custom_kappa(sequence: str):
         candidates = []
         for i, aa in enumerate(sequence):
@@ -620,9 +702,11 @@ def custom_kappa_closure(
             are_neighbours=are_neighbours,
             prob_neighbor_given_candidate=prob_neighbor_given_candidate,
             not_enough_candidates_error=not_enough_candidates_error,
-            blob=blob
-        ) 
+            blob=blob,
+        )
+
     return custom_kappa
+
 
 def complexity(sequence: str) -> float:
     """Calculate the `complexity`_ (entropy-like feature) of a target sequence.
@@ -641,11 +725,13 @@ def complexity(sequence: str) -> float:
     If the sequence is empty.
     """  # noqa: E501, pylint: disable=line-too-long
     from math import lgamma
+
     AMINOACIDS = "ACDEFGHIKLMNPQRSTVWY"
     log_gamma_sum: float = 0
     for aa in AMINOACIDS:
         log_gamma_sum += lgamma(1 + sequence.count(aa))
     return (lgamma(1 + len(sequence)) - log_gamma_sum) / len(sequence)
+
 
 def accurate_net_charge(
     ph: float,
@@ -739,6 +825,7 @@ def binary_search_root_finder(
         guess = (top + bottom) / 2
     return guess
 
+
 def isoelectric_point(sequence: str):
     """Calculate the isoelectric point of a target sequence.
 
@@ -763,7 +850,7 @@ def isoelectric_point(sequence: str):
         "Y": 10.0,
         "K": 10.0,
         "R": 12.0,
-        "H": 5.98
+        "H": 5.98,
     }
     BASIC_RES = "KHR"
 
@@ -778,6 +865,7 @@ def isoelectric_point(sequence: str):
         counts_and_pkas=counts_and_pkas,
     )
     if (continuous_charge(0) < 0) or (continuous_charge(14) > 0):
-        raise ValueError("Isoelectric point of the protein "
-            + "cannot be on the interval [0, 14].")
+        raise ValueError(
+            "Isoelectric point of the protein " + "cannot be on the interval [0, 14]."
+        )
     return binary_search_root_finder(continuous_charge, (0, 14))

@@ -6,6 +6,7 @@ like `native-features.json` in the same directory.
 
 See `compile_custom_feature` for the format of configuration.
 """
+
 import os
 import pickle
 from pathlib import Path
@@ -61,6 +62,7 @@ canonical_amino_acids = {
     "Y": 0,
     "V": 0,
 }
+
 
 ######################################
 # Utility functions
@@ -172,7 +174,9 @@ class GridScore:
         self.AvgSdevDB = {}
         for xmer in self.xmers:
             self.AvgSdevDB[xmer] = {"LR": {}, "SR": {}}
-            assert os.path.exists(self.dbpath + "/STEP4_AVGnSDEVS/PCON2.xmer" + str(xmer))
+            assert os.path.exists(
+                self.dbpath + "/STEP4_AVGnSDEVS/PCON2.xmer" + str(xmer)
+            )
             PairAvgSdevFile = open(
                 self.dbpath + "/STEP4_AVGnSDEVS/PCON2.xmer" + str(xmer)
             ).readlines()
@@ -372,7 +376,7 @@ class GridScore:
 
 #         feature_names += [tagA, tagB]
 #         feature_values += [np.mean(feature_grid[tagA]), np.mean(feature_grid[tagB])]
-    
+
 #     feat_vector = FeatureVector(seqid, feature_names, feature_values)
 #     feat_vector.dump(os.path.join(DATA_DIRECTORY, "test.csv"))
 #     return feat_vector

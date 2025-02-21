@@ -3,10 +3,10 @@ import os
 from pathlib import Path
 
 # Define the root directory as the parent of the current file's directory
-ROOT_DIR = Path(__file__).resolve().parent 
+ROOT_DIR = Path(__file__).resolve().parent
 
 # Define other paths relative to the root directory
-DATA_DIRECTORY = ROOT_DIR / '../../data'
+DATA_DIRECTORY = ROOT_DIR / "../../data"
 SCORE_DB_DIR = os.path.join(DATA_DIRECTORY, "ScoreDBs")
 
 # sr/lr tag meanings (16 features) for 8 LLPhyScore physical factors.

@@ -1,11 +1,12 @@
+# TODO: Delete this script.
 import pandas as pd
 
 # Load the CSV files into DataFrames
-df1 = pd.read_csv('cox15_output.csv')
-df2 = pd.read_csv('wildtype_fts.csv')
+df1 = pd.read_csv("../data/cox15_output.csv")
+df2 = pd.read_csv("../data/wildtype_fts.csv")
 
 # Specify the column(s) to sort by; replace 'id' with your unique identifier column
-sort_column = 'id'
+sort_column = "id"
 
 # Sort both DataFrames by the specified column(s)
 df1_sorted = df1.sort_values(by=sort_column).reset_index(drop=True)
@@ -26,7 +27,9 @@ if unique_to_df2:
 
 # Check if the DataFrames have the same shape
 if df1_sorted.shape != df2_sorted.shape:
-    print(f"The CSV files have different shapes. {df1_sorted.shape} vs {df2_sorted.shape}.")
+    print(
+        f"The CSV files have different shapes. {df1_sorted.shape} vs {df2_sorted.shape}."
+    )
 else:
     # Compare the DataFrames
     comparison_result = df1_sorted.compare(df2_sorted)
