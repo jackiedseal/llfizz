@@ -8,6 +8,8 @@ from llfizz.constants import DATA_DIRECTORY, feature_tagABs
 
 __all__ = ["FeatureVector", "Featurizer"]
 
+# TODO: Constantly returning FeatureVector objects is inefficient. Should we modify in place?
+
 
 class FeatureVector:
     """
@@ -67,26 +69,6 @@ class FeatureVector:
                 )
 
         return feature_vectors
-
-    # TODO: Should this be a static method?
-    # def dump(self, output_file: str) -> None:
-    #     """
-    #     Dump the feature vector to a CSV file.
-
-    #     Parameters
-    #     ----------
-    #     output_file : str
-    #         The path to the output CSV file.
-    #     """
-    #     featvalues = np.insert(self.features["value"].astype(str), 0, self.seqid)
-    #     np.savetxt(
-    #         output_file,
-    #         [featvalues],
-    #         delimiter=",",
-    #         header="seqid," + ",".join(self.features["name"]),
-    #         comments="",
-    #         fmt="%s",
-    #     )
 
     @staticmethod
     def dump(feature_vectors: typing.List["FeatureVector"], output_file: str) -> None:
@@ -188,7 +170,14 @@ class FeatureVector:
         """
         return self.features["value"]
 
-    # TODO: Add cmv, map_values functions.
+    def map_values(self, func) -> "FeatureVector":
+        """Applies `func` to values of the feature vector."""
+        func = np.vectorize(func)
+        return FeatureVector(
+            self.seqid, self.features["name"], func(self.features["value"])
+        )
+
+    # TODO: Add cmv functions.
 
 
 class Featurizer:
