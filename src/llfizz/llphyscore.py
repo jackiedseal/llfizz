@@ -9,10 +9,8 @@ See `compile_custom_feature` for the format of configuration.
 
 import os
 import pickle
-from pathlib import Path
 from math import sqrt
 
-import numpy as np
 import pandas as pd
 
 from llfizz.constants import DATA_DIRECTORY, feature_tagABs
@@ -214,38 +212,51 @@ class GridScore:
             gap_length = P
             pairdb_key = mid_res_aa + "_" + str(gap_length) + "_" + mseq[cterm_position]
 
-            frequency_sum_A += self.PairFreqDB[pairdb_key]["X_" + self.tagA][0] * (
-                1.0 / self.PairFreqDB[pairdb_key]["X_" + self.tagA][1]
-            )
+            if pairdb_key in self.PairFreqDB:
+                frequency_sum_A += self.PairFreqDB[pairdb_key]["X_" + self.tagA][0] * (
+                    1.0 / self.PairFreqDB[pairdb_key]["X_" + self.tagA][1]
+                )
 
-            frequency_sum_B += self.PairFreqDB[pairdb_key]["X_" + self.tagB][0] * (
-                1.0 / self.PairFreqDB[pairdb_key]["X_" + self.tagB][1]
-            )
+                frequency_sum_B += self.PairFreqDB[pairdb_key]["X_" + self.tagB][0] * (
+                    1.0 / self.PairFreqDB[pairdb_key]["X_" + self.tagB][1]
+                )
 
-            denom_total_A += 1.0 / self.PairFreqDB[pairdb_key]["X_" + self.tagA][1]
-            denom_total_B += 1.0 / self.PairFreqDB[pairdb_key]["X_" + self.tagB][1]
+                denom_total_A += 1.0 / self.PairFreqDB[pairdb_key]["X_" + self.tagA][1]
+                denom_total_B += 1.0 / self.PairFreqDB[pairdb_key]["X_" + self.tagB][1]
+            else:
+                print("Missing key: ", pairdb_key)
 
             # Values for when mid_res is the Y in X_n_Y
             nterm_position = midpoint - P - 1
             gap_length = P
             key1Y = mseq[nterm_position] + "_" + str(gap_length) + "_" + mid_res_aa
 
-            frequency_sum_A += self.PairFreqDB[key1Y]["Y_" + self.tagA][0] * (
-                1.0 / self.PairFreqDB[key1Y]["Y_" + self.tagA][1]
-            )
+            if key1Y in self.PairFreqDB:
+                frequency_sum_A += self.PairFreqDB[key1Y]["Y_" + self.tagA][0] * (
+                    1.0 / self.PairFreqDB[key1Y]["Y_" + self.tagA][1]
+                )
 
-            frequency_sum_B += self.PairFreqDB[key1Y]["Y_" + self.tagB][0] * (
-                1.0 / self.PairFreqDB[key1Y]["Y_" + self.tagB][1]
-            )
+                frequency_sum_B += self.PairFreqDB[key1Y]["Y_" + self.tagB][0] * (
+                    1.0 / self.PairFreqDB[key1Y]["Y_" + self.tagB][1]
+                )
 
-            denom_total_A += 1.0 / self.PairFreqDB[key1Y]["Y_" + self.tagA][1]
-            denom_total_B += 1.0 / self.PairFreqDB[key1Y]["Y_" + self.tagB][1]
+                denom_total_A += 1.0 / self.PairFreqDB[key1Y]["Y_" + self.tagA][1]
+                denom_total_B += 1.0 / self.PairFreqDB[key1Y]["Y_" + self.tagB][1]
+            else: 
+                print("Missing key: ", key1Y)
 
             ######SAVE WINDOW SCORE
 
             if self.min_xmer <= P + 1 <= self.max_xmer:
-                final_frequency_A = frequency_sum_A / denom_total_A
-                final_frequency_B = frequency_sum_B / denom_total_B
+                if denom_total_A > 0:
+                    final_frequency_A = frequency_sum_A / denom_total_A
+                else:
+                    final_frequency_A = 0.0
+
+                if denom_total_B > 0:
+                    final_frequency_B = frequency_sum_B / denom_total_B
+                else:
+                    final_frequency_B = 0.0
 
                 scores[P + 1] = [final_frequency_A, final_frequency_B]
 

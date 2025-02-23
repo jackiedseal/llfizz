@@ -1,7 +1,5 @@
-import os
 import typing
 import numpy as np
-import pandas as pd
 
 from llfizz.llphyscore import GridScore
 from llfizz.constants import DATA_DIRECTORY, feature_tagABs
@@ -9,8 +7,6 @@ from llfizz.constants import DATA_DIRECTORY, feature_tagABs
 __all__ = ["FeatureVector", "Featurizer"]
 
 # TODO: Constantly returning FeatureVector objects is inefficient. Should we modify in place?
-
-
 class FeatureVector:
     """
     A mapping of feature names to feature values.
@@ -164,6 +160,7 @@ class FeatureVector:
             self.seqid, self.features["name"], np.square(self.features["value"])
         )
 
+    # TODO: Wait, we don't need this method. We can just use the `features` attribute directly.
     def get_feature_values(self):
         """
         Return the feature values.
@@ -257,26 +254,4 @@ class Featurizer:
 
         return FeatureVector(seqid, feature_names, feature_values), errors
 
-    # TODO: Make this function compatible with changes to featurize method
-    def featurize_to_matrices(
-        self,
-        sequences: typing.Iterable[typing.Tuple[typing.Any, str]],
-        *,
-        acceptable_errors=(ArithmeticError, ValueError, KeyError),
-    ) -> typing.Tuple[
-        typing.Dict[typing.Any, "FeatureVector"],
-        typing.Dict[typing.Any, typing.Dict[str, Exception]],
-    ]:
-        """
-        Compute the feature vector of many sequences, and also return their failed computations.
-
-        The two returned dicts (feature vector and errors) are indexed by whatever `sequences` was indexed by.
-        """
-        fvecs_all = {}
-        errors_all = {}
-        for label, sequence in sequences:
-            fvec, errors = self.featurize(sequence, acceptable_errors=acceptable_errors)
-            fvecs_all[label] = fvec
-            if errors:
-                errors_all[label] = errors
-        return fvecs_all, errors_all
+    # TODO: Do we need a featurize_to_matrices method? 
