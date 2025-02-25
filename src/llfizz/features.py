@@ -12,9 +12,11 @@ import typing
 
 import os
 import json
+
+import numpy as np
 from functools import partial
 
-from llfizz.constants import DATA_DIRECTORY
+from llfizz.constants import DATA_DIRECTORY, feature_tagABs
 
 __all__ = [
     "compile_native_featurizer",
@@ -82,6 +84,13 @@ def compile_native_featurizer(features_dict=None):
             )
         except (ValueError, TypeError) as e:
             errors[featname] = e
+
+    # TODO: Toggle this based on featurization strat.
+    # for featname in feature_tagABs:
+    #     tagA, tagB = feature_tagABs[featname][0], feature_tagABs[featname][1]
+    #     return_value[tagA] = np.nan
+    #     return_value[tagB] = np.nan
+
     return return_value, errors
 
 

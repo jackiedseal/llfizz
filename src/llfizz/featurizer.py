@@ -2,7 +2,7 @@ import typing
 import numpy as np
 
 from llfizz.llphyscore import GridScore
-from llfizz.constants import DATA_DIRECTORY, feature_tagABs
+from llfizz.constants import DATA_DIRECTORY, SCORE_DB_DIR, feature_tagABs
 
 __all__ = ["FeatureVector", "Featurizer"]
 
@@ -184,8 +184,8 @@ class FeatureVector:
         assert len(feature_vectors) > 0, "No feature vectors to compute cmv from."
 
         featnames = feature_vectors[0].features["name"]
-        mean_feature_vector = FeatureVector("mean", featnames, np.mean([fv.features["value"] for fv in feature_vectors], axis=0))
-        var_feature_vector = FeatureVector("variance", featnames, np.var([fv.features["value"] for fv in feature_vectors], axis=0))
+        mean_feature_vector = FeatureVector("mean", featnames, np.nanmean([fv.features["value"] for fv in feature_vectors], axis=0))
+        var_feature_vector = FeatureVector("variance", featnames, np.nanvar([fv.features["value"] for fv in feature_vectors], axis=0))
 
         return mean_feature_vector, var_feature_vector
 
@@ -195,10 +195,28 @@ class Featurizer:
     def __init__(self, funcs: typing.Dict[str, typing.Callable[..., float]]) -> None:
         """`funcs` is a dictionary mapping feature names to (sequence -> float) functions."""
         self._funcs = funcs
+        self.grid_score_cache = {}
 
+    def get_funcs(self) -> typing.List[str]:
+        """Return the functions used by the featurizer."""
+        return self._funcs.values()
+    
     def featurize(
         self,
-        sequence: typing.Tuple,
+        seqid: str,
+        sequence: str,
+        *,
+        acceptable_errors=(ArithmeticError, ValueError, KeyError),
+    )  -> typing.Tuple["FeatureVector", typing.Dict[str, Exception]]:
+        native_feature_vector, native_errors = self.vanilla_featurize(seqid, sequence)
+        llphys_feature_vector, llphys_errors = self.llphyscore_featurize(seqid, sequence, SCORE_DB_DIR)
+        feature_vector = native_feature_vector.concat(llphys_feature_vector)
+        return feature_vector, native_errors | llphys_errors
+       
+    def vanilla_featurize(
+        self,
+        seqid: str,
+        sequence: str,
         *,
         acceptable_errors=(ArithmeticError, ValueError, KeyError),
     ) -> typing.Tuple["FeatureVector", typing.Dict[str, Exception]]:
@@ -208,22 +226,23 @@ class Featurizer:
         errors = {}
 
         for featname, func in self._funcs.items():
-            try:
-                feature_values.append(func(sequence[1]))
+            if func is not np.nan:
                 feature_names.append(featname)
-            except acceptable_errors as e:
-                errors[featname] = e
-        return FeatureVector(sequence[0], feature_names, feature_values), errors
+                try:
+                    feature_values.append(func(sequence))
+                except acceptable_errors as e:
+                    feature_values.append(np.nan)
+                    errors[featname] = e
+
+        return FeatureVector(seqid, feature_names, feature_values), errors
 
     # TODO: LLPhyScore doesn't have individual funcs that can be loaded in a custom config, which renders `featurize` method unhelpful. Need to think more about best design here.
     def llphyscore_featurize(
-        self, sequence: typing.Tuple, score_db_dir: str
+        self, seqid: str, sequence: str, score_db_dir: str
     ) -> typing.Tuple["FeatureVector", typing.Dict[str, Exception]]:
         """
         Compute the feature vector of a single sequence using LLPhyscore, and also return its failed computations.
         """
-        seqid, seq = sequence
-
         feature_names = []
         feature_values = []
         errors = (
@@ -233,16 +252,20 @@ class Featurizer:
         for feature in feature_tagABs:
             # load GridScore database for one feature
             tagA, tagB = feature_tagABs[feature][0], feature_tagABs[feature][1]
-            feature_grid_score = GridScore(
-                dbpath=score_db_dir + "/{}".format(feature),
-                tagA=tagA,
-                tagB=tagB,
-                max_xmer=40,
-            )
+
+            if feature not in self.grid_score_cache:
+                self.grid_score_cache[feature] = GridScore(
+                    dbpath=score_db_dir + "/{}".format(feature),
+                    tagA=tagA,
+                    tagB=tagB,
+                    max_xmer=40,
+                )
+
+            feature_grid_score = self.grid_score_cache[feature]
 
             # generate the one-feature grids for all seqs.
             # TODO: Make this compatible with featurizing multiple sequences, ie. for seqid, seq in sequences.items()
-            _tag, res_scores = feature_grid_score.score_sequence((seqid, seq))
+            _tag, res_scores = feature_grid_score.score_sequence((seqid, sequence))
             feature_grid = {tagA: [], tagB: []}
 
             for r in res_scores:
@@ -250,6 +273,10 @@ class Featurizer:
                 feature_grid[tagB].append(r.B)
 
             feature_names += [tagA, tagB]
+
+            self._funcs[tagA] = np.nan
+            self._funcs[tagB] = np.nan
+
             feature_values += [np.mean(feature_grid[tagA]), np.mean(feature_grid[tagB])]
 
         return FeatureVector(seqid, feature_names, feature_values), errors

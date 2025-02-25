@@ -9,6 +9,20 @@ ROOT_DIR = Path(__file__).resolve().parent
 DATA_DIRECTORY = ROOT_DIR / "../../data"
 SCORE_DB_DIR = os.path.join(DATA_DIRECTORY, "ScoreDBs")
 
+# Define constants used in (for now, just) designer.py 
+# TODO: Is there significant lag time associated with importing?
+AMINOACIDS = list("ACDEFGHIKLMNPQRSTVWY")
+N_AA = len(AMINOACIDS)
+MAX_RETRIES = 15
+
+# TODO: Define a more descriptive name for CHARGE.
+CHARGE = {
+    "D": -1,
+    "E": -1,
+    "K": 1,
+    "R": 1
+}
+
 # sr/lr tag meanings (16 features) for 8 LLPhyScore physical factors.
 feature_tagABs = {
     "S2.SUMPI": ["srpipi", "lrpipi"],
