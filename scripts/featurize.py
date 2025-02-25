@@ -111,16 +111,19 @@ def featurize_sequences(
     output_file : str
         The path to the output CSV file.
     """
-    # TODO: This will need to handle multiple sequences at some point.
-    native_feat_vector, errors = featurizer.featurize(sequences[0])
-    llphys_feat_vector, errors = featurizer.llphyscore_featurize(
-        sequences[0], SCORE_DB_DIR
-    )
-    feat_vector = native_feat_vector.concat(llphys_feat_vector)
-    report_errors(errors, context="featurizing")
+    # TODO: Is there a more efficient way to do this a la matrix featurization?
+    # TODO: Check if tuple access works?
+    feature_vectors = []
+    for sequence in tqdm.tqdm(sequences, total=len(sequences), desc="Featurizing sequences"):
+        native_feature_vector, errors = featurizer.featurize(sequence[0], sequence[1])
+        llphys_feature_vector, errors = featurizer.llphyscore_featurize(
+            sequence[1], SCORE_DB_DIR
+        )
+        feature_vector = native_feature_vector.concat(llphys_feature_vector)
+        report_errors(errors, context="featurizing")
+        feature_vectors.append(feature_vector)
 
-    FeatureVector.dump([feat_vector], output_file)
-
+    FeatureVector.dump(feature_vectors, output_file)
 
 def main() -> None:
     setup_logging()
@@ -133,47 +136,21 @@ def main() -> None:
     featurizer = Featurizer(featurizer_config)
     fa = Fasta.load(args.input_sequences)
 
+    seen = set()
     sequences = [
         (protein_id, seq)
         for protein_id, seq in tqdm.tqdm(
             fa, total=len(fa), desc="Featurizing sequences"
         )
+        if seq not in seen and not seen.add(seq)
     ]
+    
     featurize_sequences(
         featurizer, sequences, args.output_file
     )  # <-- Pass args.output_file
 
     # TODO: Implement region-based featurization.
-    # if args.input_regions is None:
-    #     sequences = [(protein_id, seq) for protein_id, seq in tqdm.tqdm(fa, total=len(fa), desc="Featurizing sequences")]
-    #     featurize_sequences(featurizer, sequences, ("ProteinID",), args.output_file)  # <-- Pass args.output_file
-    # else:
-    #     regions, _ = Regions.load(args.input_regions)
-    #     Fasta.assume_unique = True
-    #     sequences: List[Tuple[Tuple[str, str], str]] = []
-
-    #     for prot_id, region_id, (start, stop) in regions.iter_nested():
-    #         entry = fa.get(prot_id)
-    #         if entry is None:
-    #             logging.warning(f"Protein `{prot_id}` not found in FASTA; skipping region `{region_id}`.")
-    #             continue
-
-    #         _, whole_seq = entry
-    #         if not isinstance(whole_seq, str):
-    #             logging.error(f"Expected sequence string for protein `{prot_id}`, got {type(whole_seq)} instead.")
-    #             continue
-
-    #         seq = whole_seq[start:stop]
-    #         if len(seq) != stop - start:
-    #             logging.error(
-    #                 f"Invalid region `{region_id}` for protein `{prot_id}` "
-    #                 f"(start={start}, stop={stop}, seqlen={len(whole_seq)})"
-    #             )
-    #             continue
-    #         sequences.append(((prot_id, region_id), seq))
-
-    #     featurize_sequences(featurizer, sequences, ("ProteinID", "RegionID"), args.output_file)  # <-- Pass args.output_file
-
-
+   
+   
 if __name__ == "__main__":
     main()
