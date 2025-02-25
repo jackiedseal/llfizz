@@ -528,10 +528,6 @@
             "compute": "percent_res_group",
             "residue_group": "aromatic"
         },
-        "arospacing": {
-            "compute": "simple_spacing",
-            "residue_group": "aromatic"
-        },
         "basic": {
             "compute": "percent_res_group",
             "residue_group": "basic"
