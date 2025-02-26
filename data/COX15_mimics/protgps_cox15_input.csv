@@ -1,0 +1,13 @@
+ProtID,Predicted Compartment,Score
+COX15,nuclear_speckle,3.4800316e-12
+COX15,p-body,6.285105e-06
+COX15,pml-body,5.5137787e-12
+COX15,post_synaptic_density,9.536264e-12
+COX15,stress_granule,2.8796712e-06
+COX15,chromosome,0.9708614
+COX15,nucleolus,4.4333967e-07
+COX15,nuclear_pore_complex,0.02912902
+COX15,cajal_body,8.701511e-10
+COX15,rna_granule,4.863549e-22
+COX15,cell_junction,3.7357406e-14
+COX15,transcriptional,4.6715534e-13
