@@ -1,0 +1,11 @@
+ProtID,Predicted Compartment,Score
+COX15,Extracellular,0.007373589
+COX15,Plastid,0.048939135
+COX15,Cytoplasm,0.15069556
+COX15,Mitochondrion,0.258715
+COX15,Nucleus,0.052058395
+COX15,Endoplasmic.reticulum,0.06525288
+COX15,Golgi.apparatus,0.06045355
+COX15,Cell.membrane,0.08341381
+COX15,Lysosome/Vacuole,0.020423861
+COX15,Peroxisome,0.25267422

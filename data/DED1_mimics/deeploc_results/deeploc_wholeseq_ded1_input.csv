@@ -1,0 +1,11 @@
+ProtID,Predicted Compartment,Score
+DED1,Extracellular,0.011663276
+DED1,Plastid,0.032189675
+DED1,Cytoplasm,0.31485903
+DED1,Mitochondrion,0.013380477
+DED1,Nucleus,0.31509647
+DED1,Endoplasmic.reticulum,0.011883312
+DED1,Golgi.apparatus,0.011245985
+DED1,Cell.membrane,0.19663122
+DED1,Lysosome/Vacuole,0.083148
+DED1,Peroxisome,0.009902513
