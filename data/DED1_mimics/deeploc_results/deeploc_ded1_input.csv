@@ -1,0 +1,2 @@
+Protein_ID,experiment,Localizations,Signals,Cytoplasm,Nucleus,Extracellular,Cell membrane,Mitochondrion,Plastid,Endoplasmic reticulum,Lysosome/Vacuole,Golgi apparatus,Peroxisome
+DED1,Wild-type DED1,,,0.32436636,0.3362868,0.009988629,0.2312366,0.011723767,0.008590027,0.0080451965,0.05273775,0.012942422,0.004082514
