@@ -115,11 +115,12 @@ def featurize_sequences(
     # TODO: Check if tuple access works?
     feature_vectors = []
     for sequence in tqdm.tqdm(sequences, total=len(sequences), desc="Featurizing sequences"):
-        native_feature_vector, errors = featurizer.featurize(sequence[0], sequence[1])
-        llphys_feature_vector, errors = featurizer.llphyscore_featurize(
-            sequence[1], SCORE_DB_DIR
-        )
-        feature_vector = native_feature_vector.concat(llphys_feature_vector)
+    #     native_feature_vector, errors = featurizer.featurize(sequence[0], sequence[1])
+    #     llphys_feature_vector, errors = featurizer.llphyscore_featurize(
+    #         sequence[0], sequence[1], SCORE_DB_DIR
+    #     )
+    #     feature_vector = native_feature_vector.concat(llphys_feature_vector)
+        feature_vector, errors = featurizer.featurize(sequence[0], sequence[1])
         report_errors(errors, context="featurizing")
         feature_vectors.append(feature_vector)
 

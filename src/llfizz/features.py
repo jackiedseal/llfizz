@@ -86,10 +86,10 @@ def compile_native_featurizer(features_dict=None):
             errors[featname] = e
 
     # TODO: Toggle this based on featurization strat.
-    # for featname in feature_tagABs:
-    #     tagA, tagB = feature_tagABs[featname][0], feature_tagABs[featname][1]
-    #     return_value[tagA] = np.nan
-    #     return_value[tagB] = np.nan
+    for featname in feature_tagABs:
+        tagA, tagB = feature_tagABs[featname][0], feature_tagABs[featname][1]
+        return_value[tagA] = np.nan
+        return_value[tagB] = np.nan
 
     return return_value, errors
 
