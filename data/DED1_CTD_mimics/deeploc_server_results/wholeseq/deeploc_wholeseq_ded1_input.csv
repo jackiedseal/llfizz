@@ -1,0 +1,2 @@
+Protein_ID,experiment,Localizations,Signals,Membrane types,Cytoplasm,Nucleus,Extracellular,Cell membrane,Mitochondrion,Plastid,Endoplasmic reticulum,Lysosome/Vacuole,Golgi apparatus,Peroxisome,Peripheral,Transmembrane,Lipid anchor,Soluble
+DED1,wild-type Ded1,Cytoplasm|Nucleus,Nuclear localization signal,Soluble,0.7936999797821045,0.5109000205993652,0.0467000007629394,0.0529999993741512,0.1312000006437301,0.0027000000700354,0.0832000002264976,0.0908999964594841,0.065700002014637,0.002600000007078,0.1689999997615814,0.0208000000566244,0.1204999983310699,0.9024999737739564
