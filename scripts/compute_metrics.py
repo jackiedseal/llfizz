@@ -7,14 +7,10 @@ Example
 `$ python compute-metric.py input-features.csv output.csv`
 """
 
-import json
-import sys
 import math
-import tqdm
 import argparse
 
-from llfizz.featurizer import FeatureVector, Featurizer
-from llfizz.features import compile_native_featurizer
+from llfizz.featurizer import FeatureVector
 from llfizz.metrics import Metric
 
 
@@ -25,11 +21,6 @@ def parse_args():
     )
     parser.add_argument("input_file", help="input features csv file")
     parser.add_argument("output_file", help="output features csv file")
-
-    # TODO: Do we need these?
-    # parser.add_argument("--input-labels", nargs="*", required=False, help="column name(s) containing identifying columns in the INPUT file")
-    # parser.add_argument("--output-label", required=False, default="Label", help="column labelling the origin or weights vector in the OUTPUT file")
-    # parser.add_argument("--feature-file", required=False, help="feature configuration json")
     return parser.parse_args()
 
 
