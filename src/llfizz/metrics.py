@@ -1,4 +1,3 @@
-import typing
 import numpy as np
 from llfizz.featurizer import FeatureVector
 
@@ -18,8 +17,7 @@ class Metric:
         self, fvec_a: FeatureVector, fvec_b: FeatureVector
     ) -> float:
         """Compute the Euclidean distance between two feature vectors."""
-        # TODO: Make this more efficient?
-        # TODO: This is senstive to small numerical errors from saving and reopening file. Worth fixing?
+        # TODO: This is senstive to small numerical errors from saving and reopening file. Fix.
         z = (fvec_a - fvec_b) * self.weights
         norm = np.sum(z.square().get_feature_values())
         return norm

@@ -6,6 +6,7 @@ from llfizz.constants import DATA_DIRECTORY, SCORE_DB_DIR, feature_tagABs
 
 __all__ = ["FeatureVector", "Featurizer"]
 
+
 # TODO: Constantly returning FeatureVector objects is inefficient. Should we modify in place?
 class FeatureVector:
     """
@@ -175,7 +176,9 @@ class FeatureVector:
         )
 
     @staticmethod
-    def get_mean_and_var(feature_vectors: typing.List["FeatureVector"]) -> typing.Tuple["FeatureVector", "FeatureVector", "FeatureVector"]:
+    def get_mean_and_var(
+        feature_vectors: typing.List["FeatureVector"],
+    ) -> typing.Tuple["FeatureVector", "FeatureVector", "FeatureVector"]:
         """
         Returns a mean and variance  tuple from the iterable of feature vectors.
 
@@ -184,11 +187,18 @@ class FeatureVector:
         assert len(feature_vectors) > 0, "No feature vectors to compute cmv from."
 
         featnames = feature_vectors[0].features["name"]
-        mean_feature_vector = FeatureVector("mean", featnames, np.nanmean([fv.features["value"] for fv in feature_vectors], axis=0))
-        var_feature_vector = FeatureVector("variance", featnames, np.nanvar([fv.features["value"] for fv in feature_vectors], axis=0))
+        mean_feature_vector = FeatureVector(
+            "mean",
+            featnames,
+            np.nanmean([fv.features["value"] for fv in feature_vectors], axis=0),
+        )
+        var_feature_vector = FeatureVector(
+            "variance",
+            featnames,
+            np.nanvar([fv.features["value"] for fv in feature_vectors], axis=0),
+        )
 
         return mean_feature_vector, var_feature_vector
-
 
 
 class Featurizer:
@@ -200,19 +210,31 @@ class Featurizer:
     def get_funcs(self) -> typing.List[str]:
         """Return the functions used by the featurizer."""
         return self._funcs.values()
-    
+
     def featurize(
         self,
         seqid: str,
         sequence: str,
+        feature_set: str,
         *,
         acceptable_errors=(ArithmeticError, ValueError, KeyError),
-    )  -> typing.Tuple["FeatureVector", typing.Dict[str, Exception]]:
-        native_feature_vector, native_errors = self.vanilla_featurize(seqid, sequence)
-        llphys_feature_vector, llphys_errors = self.llphyscore_featurize(seqid, sequence, SCORE_DB_DIR)
-        feature_vector = native_feature_vector.concat(llphys_feature_vector)
-        return feature_vector, native_errors | llphys_errors
-       
+    ) -> typing.Tuple["FeatureVector", typing.Dict[str, Exception]]:
+        if feature_set == "original":
+            return self.vanilla_featurize(
+                seqid, sequence, acceptable_errors=acceptable_errors
+            )
+        elif feature_set == "LLPhyScore":
+            return self.llphyscore_featurize(seqid, sequence, SCORE_DB_DIR)
+        elif feature_set == "hybrid":
+            native_feature_vector, native_errors = self.vanilla_featurize(
+                seqid, sequence
+            )
+            llphys_feature_vector, llphys_errors = self.llphyscore_featurize(
+                seqid, sequence, SCORE_DB_DIR
+            )
+            feature_vector = native_feature_vector.concat(llphys_feature_vector)
+            return feature_vector, native_errors | llphys_errors
+
     def vanilla_featurize(
         self,
         seqid: str,
@@ -236,9 +258,9 @@ class Featurizer:
 
         return FeatureVector(seqid, feature_names, feature_values), errors
 
-    # TODO: LLPhyScore doesn't have individual funcs that can be loaded in a custom config, which renders `featurize` method unhelpful. Need to think more about best design here.
+    # TODO: LLPhyScore doesn't have individual funcs that can be loaded in a custom config, which renders `featurize` method unhelpful. This is a bandaid solution.
     def llphyscore_featurize(
-        self, seqid: str, sequence: str, score_db_dir: str
+        self, seqid: str, sequence: str, score_db_dir: str = SCORE_DB_DIR
     ) -> typing.Tuple["FeatureVector", typing.Dict[str, Exception]]:
         """
         Compute the feature vector of a single sequence using LLPhyscore, and also return its failed computations.
@@ -247,10 +269,10 @@ class Featurizer:
         feature_values = []
         errors = (
             {}
-        )  # TODO: Empty because all error handling done in internal LLPhyscore code.
+        )  # Empty because all error handling done in internal LLPhyscore code.
 
         for feature in feature_tagABs:
-            # load GridScore database for one feature
+            # Load GridScore database for one feature
             tagA, tagB = feature_tagABs[feature][0], feature_tagABs[feature][1]
 
             if feature not in self.grid_score_cache:
@@ -263,7 +285,7 @@ class Featurizer:
 
             feature_grid_score = self.grid_score_cache[feature]
 
-            # generate the one-feature grids for all seqs.
+            # Generate the one-feature grids for all seqs.
             # TODO: Make this compatible with featurizing multiple sequences, ie. for seqid, seq in sequences.items()
             _tag, res_scores = feature_grid_score.score_sequence((seqid, sequence))
             feature_grid = {tagA: [], tagB: []}
@@ -277,8 +299,10 @@ class Featurizer:
             self._funcs[tagA] = np.nan
             self._funcs[tagB] = np.nan
 
-            feature_values += [np.mean(feature_grid[tagA]), np.mean(feature_grid[tagB])]
+            feature_values += [
+                np.mean(feature_grid[tagA]),
+                np.mean(feature_grid[tagB]),
+            ]  # Mean aggregation
+            # feature_values += [np.max(feature_grid[tagA]), np.max(feature_grid[tagB])] # Max aggregation
 
         return FeatureVector(seqid, feature_names, feature_values), errors
-
-    # TODO: Do we need a featurize_to_matrices method? 

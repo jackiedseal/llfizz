@@ -33,7 +33,7 @@ __all__ = [
 ]
 
 
-def compile_native_featurizer(features_dict=None):
+def compile_native_featurizer(feature_set, features_dict=None):
     """
     Given a nested-dict object like `native-features.json` in this directory,
     make a dictionary of names to feature functions.
@@ -65,31 +65,41 @@ def compile_native_featurizer(features_dict=None):
     The "aa_frequencies" section is a dict of amino acids to their expected frequencies in the IDRome.
     See `repeats_minus_expected` and `compile_native_feature`.
     """
-    if features_dict is None:
-        with open(os.path.join(DATA_DIRECTORY, "native-features.json"), "r") as file:
-            features_dict = json.load(file)
-    features = features_dict["features"]
-    residue_groups = features_dict.get("residue_groups") or {}
-    motif_frequencies = features_dict.get("motif_frequencies") or {}
-    residue_frequencies = features_dict.get("aa_frequencies")
-    return_value = {}
-    errors = {}
-    for featname, feature_params in features.items():
-        try:
-            return_value[featname] = compile_native_feature(
-                residue_groups=residue_groups,
-                motif_frequencies=motif_frequencies,
-                residue_frequencies=residue_frequencies,
-                **feature_params,
-            )
-        except (ValueError, TypeError) as e:
-            errors[featname] = e
+    if feature_set == "original" or feature_set == "hybrid":
+        if features_dict is None:
+            with open(
+                os.path.join(DATA_DIRECTORY, "feature_config/native-features.json"), "r"
+            ) as file:
+                features_dict = json.load(file)
 
-    # TODO: Toggle this based on featurization strat.
-    for featname in feature_tagABs:
-        tagA, tagB = feature_tagABs[featname][0], feature_tagABs[featname][1]
-        return_value[tagA] = np.nan
-        return_value[tagB] = np.nan
+        features = features_dict["features"]
+        residue_groups = features_dict.get("residue_groups") or {}
+        motif_frequencies = features_dict.get("motif_frequencies") or {}
+        residue_frequencies = features_dict.get("aa_frequencies") or {}
+
+        return_value = {}
+        errors = {}
+
+        for featname, feature_params in features.items():
+            try:
+                return_value[featname] = compile_native_feature(
+                    residue_groups=residue_groups,
+                    motif_frequencies=motif_frequencies,
+                    residue_frequencies=residue_frequencies,
+                    **feature_params,
+                )
+            except (ValueError, TypeError) as e:
+                errors[featname] = e
+
+    if feature_set == "hybrid" or feature_set == "LLPhyScore":
+        if feature_set == "LLPhyScore":
+            return_value = {}
+            errors = {}
+
+        for featname in feature_tagABs:
+            tagA, tagB = feature_tagABs[featname][0], feature_tagABs[featname][1]
+            return_value[tagA] = np.nan
+            return_value[tagB] = np.nan
 
     return return_value, errors
 

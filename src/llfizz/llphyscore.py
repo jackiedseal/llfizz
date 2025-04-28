@@ -23,7 +23,6 @@ pd.set_option("display.width", 1000)
 # LLPhyScore's parameters
 ##################################
 
-# TODO: Move these to constants.py
 # features in the predictor.
 features = [
     "protein-water",
@@ -242,7 +241,7 @@ class GridScore:
 
                 denom_total_A += 1.0 / self.PairFreqDB[key1Y]["Y_" + self.tagA][1]
                 denom_total_B += 1.0 / self.PairFreqDB[key1Y]["Y_" + self.tagB][1]
-            else: 
+            else:
                 print("Missing key: ", key1Y)
 
             ######SAVE WINDOW SCORE
@@ -350,49 +349,3 @@ class GridScore:
                 )
                 scoredata.append(rscore)
         return tag, scoredata
-
-
-##################################
-# Load sequences and get scores
-##################################
-# TODO: Get rid of this function. Functionality moved to Featurizer.
-# def seqs_to_bulk_features(sequences, score_db_dir):
-#     """
-#     For multiple sequences ({tag: seq} dictionary), convert to grids ({tag: grid}).
-#     """
-#     seqid, seq = sequences.popitem()
-
-#     feature_names = []
-#     feature_values = []
-
-#     for feature in feature_tagABs:
-#         # load GridScore database for one feature
-#         tagA, tagB = feature_tagABs[feature][0], feature_tagABs[feature][1]
-#         feature_grid_score = GridScore(
-#             dbpath=score_db_dir + "/{}".format(feature),
-#             tagA=tagA,
-#             tagB=tagB,
-#             max_xmer=40,
-#         )
-
-#         # generate the one-feature grids for all seqs.
-#         # TODO: for seqid, seq in sequences.items():
-
-#         _tag, res_scores = feature_grid_score.score_sequence((seqid, seq))
-#         feature_grid = {tagA: [], tagB: []}
-
-#         for r in res_scores:
-#             feature_grid[tagA].append(r.A)
-#             feature_grid[tagB].append(r.B)
-
-#         feature_names += [tagA, tagB]
-#         feature_values += [np.mean(feature_grid[tagA]), np.mean(feature_grid[tagB])]
-
-#     feat_vector = FeatureVector(seqid, feature_names, feature_values)
-#     feat_vector.dump(os.path.join(DATA_DIRECTORY, "test.csv"))
-#     return feat_vector
-
-# TODO: deal with the fact that seqs is a {tag:seq} dictionary, not (tag:seq) tuple
-# if __name__ == "__main__":
-#     seqs = {"COX15": "MLFRNIEVGRQAAKLLTRTSSRLAWQSIGASRNISTIRQQIRKTQ"}
-#     bulk_features = seqs_to_bulk_features(sequences=seqs, score_db_dir=score_db_dir)
