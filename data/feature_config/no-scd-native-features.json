@@ -1,0 +1,639 @@
+{
+    "features": {
+        "AA_A": {
+            "compute": "percent_residue",
+            "residue": "A"
+        },
+        "AA_C": {
+            "compute": "percent_residue",
+            "residue": "C"
+        },
+        "AA_D": {
+            "compute": "percent_residue",
+            "residue": "D"
+        },
+        "AA_E": {
+            "compute": "percent_residue",
+            "residue": "E"
+        },
+        "AA_F": {
+            "compute": "percent_residue",
+            "residue": "F"
+        },
+        "AA_G": {
+            "compute": "percent_residue",
+            "residue": "G"
+        },
+        "AA_H": {
+            "compute": "percent_residue",
+            "residue": "H"
+        },
+        "AA_I": {
+            "compute": "percent_residue",
+            "residue": "I"
+        },
+        "AA_K": {
+            "compute": "percent_residue",
+            "residue": "K"
+        },
+        "AA_L": {
+            "compute": "percent_residue",
+            "residue": "L"
+        },
+        "AA_M": {
+            "compute": "percent_residue",
+            "residue": "M"
+        },
+        "AA_N": {
+            "compute": "percent_residue",
+            "residue": "N"
+        },
+        "AA_P": {
+            "compute": "percent_residue",
+            "residue": "P"
+        },
+        "AA_Q": {
+            "compute": "percent_residue",
+            "residue": "Q"
+        },
+        "AA_R": {
+            "compute": "percent_residue",
+            "residue": "R"
+        },
+        "AA_S": {
+            "compute": "percent_residue",
+            "residue": "S"
+        },
+        "AA_T": {
+            "compute": "percent_residue",
+            "residue": "T"
+        },
+        "AA_V": {
+            "compute": "percent_residue",
+            "residue": "V"
+        },
+        "AA_W": {
+            "compute": "percent_residue",
+            "residue": "W"
+        },
+        "AA_Y": {
+            "compute": "percent_residue",
+            "residue": "Y"
+        },
+        "CLV_C14_Caspase3-7": {
+            "compute": "count",
+            "pattern": "[DSTE][^P][^DEWHFYC]D[GSAN]"
+        },
+        "DEG_APCC_KENBOX_2": {
+            "compute": "count",
+            "pattern": ".KEN."
+        },
+        "DEG_Kelch_Keap1_1": {
+            "compute": "count",
+            "pattern": "[DNS].[DES][TNS]GE"
+        },
+        "DEG_SCF_TRCP1_1": {
+            "compute": "count",
+            "pattern": "D(S)G.{2,3}([ST])"
+        },
+        "DOC_ANK_TNKS_1": {
+            "compute": "count",
+            "pattern": ".R..[PGAV][DEIP]G."
+        },
+        "DOC_CYCLIN_RxL_1": {
+            "compute": "count",
+            "pattern": "(.|([KRH].{0,3}))[^EDWNSG][^D][RK][^D]L.{0,1}[FLMP].{0,3}[EDST]"
+        },
+        "DOC_MAPK_JIP1_4": {
+            "compute": "count",
+            "pattern": "[RK]P[^P][^P]L.[LIVMF]"
+        },
+        "DOC_MAPK_MEF2A_6": {
+            "compute": "count",
+            "pattern": "[RK].{2,4}[LIVMP].[LIV].[LIVMF]"
+        },
+        "DOC_MAPK_NFAT4_5": {
+            "compute": "count",
+            "pattern": "[RK][^P][^P][LIM].L.[LIVMF]."
+        },
+        "DOC_MAPK_gen_1": {
+            "compute": "count",
+            "pattern": "[KR]{0,2}[KR].{0,2}[KR].{2,4}[ILVM].[ILVF]"
+        },
+        "DOC_PP1_RVXF_1": {
+            "compute": "count",
+            "pattern": "..[RK].{0,1}[VIL][^P][FW]."
+        },
+        "DOC_PP2A_B56_1": {
+            "compute": "count",
+            "pattern": "([LMFYWIC]..I.E)|(L..[IVLWC].E)."
+        },
+        "DOC_PP4_FxxP_1": {
+            "compute": "count",
+            "pattern": "F..P"
+        },
+        "DOC_WW_Pin1_4": {
+            "compute": "count",
+            "pattern": "...([ST])P."
+        },
+        "D_repeats": {
+            "compute": "repeats",
+            "residues": [
+                "D"
+            ]
+        },
+        "ED_ratio": {
+            "compute": "log_ratio",
+            "denominator": "D",
+            "numerator": "E"
+        },
+        "ELASTIN_LIKE": {
+            "compute": "span",
+            "pattern": "VPG.G"
+        },
+        "E_repeats": {
+            "compute": "repeats",
+            "residues": [
+                "E"
+            ]
+        },
+        "FG_repeats": {
+            "compute": "repeats",
+            "residues": [
+                "F",
+                "G"
+            ]
+        },
+        "FG_rich": {
+            "compute": "span",
+            "pattern": "[FG].FG"
+        },
+        "FGxF": {
+            "compute": "span",
+            "pattern": "FG.F"
+        },
+        "FRG": {
+            "compute": "span",
+            "pattern": "[FR]G"
+        },
+        "G_repeats": {
+            "compute": "repeats",
+            "residues": [
+                "G"
+            ]
+        },
+        "KAP_repeats": {
+            "compute": "repeats",
+            "residues": [
+                "K",
+                "A",
+                "P"
+            ]
+        },
+        "KL_hydropathy": {
+            "compute": "score",
+            "take_average": true,
+            "score": {
+                "A": 1.8,
+                "C": 2.5,
+                "D": -3.5,
+                "E": -3.5,
+                "F": 2.8,
+                "G": -0.4,
+                "H": -3.2,
+                "I": 4.5,
+                "K": -3.9,
+                "L": 3.8,
+                "M": 1.9,
+                "N": -3.5,
+                "P": -1.6,
+                "Q": -3.5,
+                "R": -4.5,
+                "S": -0.8,
+                "T": -0.7,
+                "V": 4.2,
+                "W": -0.9,
+                "Y": -1.3
+            }
+        },
+        "K_repeats": {
+            "compute": "repeats",
+            "residues": [
+                "K"
+            ]
+        },
+        "LIG_14-3-3_CanoR_1": {
+            "compute": "count",
+            "pattern": "R[^DE]{0,2}[^DEPG]([ST])(([FWYLMV].)|([^PRIKGN]P)|([^PRIKGN].{2,4}[VILMFWYP]))"
+        },
+        "LIG_CaM_IQ_9": {
+            "compute": "count",
+            "pattern": "[ACLIVTM][^P][^P][ILVMFCT]Q[^P][^P][^P][RK][^P]{4,5}[RKQ][^P][^P]"
+        },
+        "LIG_CtBP_PxDLS_1": {
+            "compute": "count",
+            "pattern": "(P[LVIPME][DENS][LM][VASTRG])|(G[LVIPME][DENS][LM][VASTRG]((K)|(.[KR])))"
+        },
+        "LIG_EF_ALG2_ABM_1": {
+            "compute": "count",
+            "pattern": "P[PG]{0,1}YP.{1,6}Y[QS]{0,1}P"
+        },
+        "LIG_EH_1": {
+            "compute": "count",
+            "pattern": ".NPF."
+        },
+        "LIG_HCF-1_HBM_1": {
+            "compute": "count",
+            "pattern": "[DE]H.Y"
+        },
+        "LIG_HOMEOBOX": {
+            "compute": "count",
+            "pattern": "[FY][DEP]WM"
+        },
+        "LIG_KEPE_2": {
+            "compute": "count",
+            "pattern": "[VILMFT]K.EP.{2,3}[DE]"
+        },
+        "LIG_KLC1_WD_1": {
+            "compute": "count",
+            "pattern": "[LMTAFSRI][^KRG]W[DE].{3,5}[LIVMFPA]"
+        },
+        "LIG_LIR_Gen_1": {
+            "compute": "count",
+            "pattern": "[EDST].{0,2}[WFY][^RKPG][^PG][ILV]"
+        },
+        "LIG_PAM2_1": {
+            "compute": "count",
+            "pattern": "..[LFP][NS][PIVTAFL].A..(([FY].[PYLF])|(W..))."
+        },
+        "LIG_PCNA_PIPBox_1": {
+            "compute": "count",
+            "pattern": "[QM].[^FHWY][LIVM][^P][^PFWYMLIV](([FYHL][FYW])|([FYH][FYWL])).."
+        },
+        "LIG_PDZ_Class_1": {
+            "compute": "count",
+            "pattern": "...[ST].[ACVILF]$"
+        },
+        "LIG_PDZ_Wminus1_1": {
+            "compute": "count",
+            "pattern": ".W[ACGILV]$"
+        },
+        "LIG_PTAP_UEV_1": {
+            "compute": "count",
+            "pattern": ".P[TS]AP."
+        },
+        "LIG_PTB_Apo_2": {
+            "compute": "count",
+            "pattern": "(.[^P].NP.[FY].)|(.[ILVMFY].N..[FY].)"
+        },
+        "LIG_PTB_Phospho_1": {
+            "compute": "count",
+            "pattern": "(.[^P].NP.(Y))|(.[ILVMFY].N..(Y))"
+        },
+        "LIG_Rb_LxCxE_1": {
+            "compute": "count",
+            "pattern": "([DEST]|^).{0,4}[LI].C.E.{1,4}[FLMIVAWPHY].{0,8}([DEST]|$)"
+        },
+        "LIG_SH2_CRK": {
+            "compute": "count",
+            "pattern": "(Y)[^EPILVFYW][^HDEW][PLIV][^DEW]"
+        },
+        "LIG_SH2_GRB2like": {
+            "compute": "count",
+            "pattern": "(Y)([EDST]|[MLIVAFYHQW])N."
+        },
+        "LIG_SH2_NCK_1": {
+            "compute": "count",
+            "pattern": "(Y)[DESTNA][^GWFY][VPAI][DENQSTAGYFP]"
+        },
+        "LIG_SH2_SRC": {
+            "compute": "count",
+            "pattern": "(Y)[QDEVAIL][DENPYHI][IPVGAHS]"
+        },
+        "LIG_SH2_STAP1": {
+            "compute": "count",
+            "pattern": "(Y)[DESTA][^GP][^GP][ILVFMWYA]"
+        },
+        "LIG_SH2_STAT5": {
+            "compute": "count",
+            "pattern": "(Y)[VLTFIC].."
+        },
+        "LIG_SH3_2": {
+            "compute": "count",
+            "pattern": "P..P.[KR]"
+        },
+        "LIG_SUMO_SIM_anti_2": {
+            "compute": "count",
+            "pattern": "[DEST]{1,10}.{0,1}[VIL][DESTVILMA][VIL][VILM].[DEST]{0,5}"
+        },
+        "LIG_SUMO_SIM_par_1": {
+            "compute": "count",
+            "pattern": "[DEST]{0,5}.[VILPTM][VIL][DESTVILMA][VIL].{0,1}[DEST]{1,10}"
+        },
+        "MOD_CDK_SPK_2": {
+            "compute": "count",
+            "pattern": "...([ST])P[RK]"
+        },
+        "MOD_CDK_SPxK_1": {
+            "compute": "count",
+            "pattern": "...([ST])P.[KR]"
+        },
+        "MOD_CDK_SPxxK_3": {
+            "compute": "count",
+            "pattern": "...([ST])P..[RK]"
+        },
+        "MOD_CK1_1": {
+            "compute": "count",
+            "pattern": "S..([ST])..."
+        },
+        "MOD_CK2_1": {
+            "compute": "count",
+            "pattern": "...([ST])..E"
+        },
+        "MOD_DYRK1A_RPxSP_1": {
+            "compute": "count",
+            "pattern": "R[PSVA].([ST])P"
+        },
+        "MOD_GSK3_1": {
+            "compute": "count",
+            "pattern": "...([ST])...[ST]"
+        },
+        "MOD_N-GLC_1": {
+            "compute": "count",
+            "pattern": ".(N)[^P][ST].."
+        },
+        "MOD_NMyristoyl": {
+            "compute": "count",
+            "pattern": "^M{0,1}(G)[^EDRKHPFYW]..[STAGCN][^P]"
+        },
+        "MOD_PIKK_1": {
+            "compute": "count",
+            "pattern": "...([ST])Q.."
+        },
+        "MOD_PKA_1": {
+            "compute": "count",
+            "pattern": "[RK][RK].([ST])[^P].."
+        },
+        "MOD_PKA_2": {
+            "compute": "count",
+            "pattern": ".R.([ST])[^P].."
+        },
+        "MOD_PKB_1": {
+            "compute": "count",
+            "pattern": "R.R..([ST])[^P].."
+        },
+        "MOD_Plk_1": {
+            "compute": "count",
+            "pattern": ".[DNE][^PG][ST](([FYILMVW]..)|([^PEDGKN][FWYLIVM]).)"
+        },
+        "MOD_ProDKin_1": {
+            "compute": "count",
+            "pattern": "...([ST])P.."
+        },
+        "MOD_SUMO_for_1": {
+            "compute": "count",
+            "pattern": "[VILMAFP](K).E"
+        },
+        "MOD_SUMO_rev_2": {
+            "compute": "count",
+            "pattern": "[SDE].{0,5}[DE].(K).{0,1}[AIFLMPSTV]"
+        },
+        "N_repeats": {
+            "compute": "repeats",
+            "residues": [
+                "N"
+            ]
+        },
+        "PG_rich": {
+            "compute": "span",
+            "pattern": "G..[GP][PG]"
+        },
+        "PR_repeats": {
+            "compute": "repeats",
+            "residues": [
+                "P",
+                "R"
+            ]
+        },
+        "PTS_repeats": {
+            "compute": "repeats",
+            "residues": [
+                "P",
+                "T",
+                "S"
+            ]
+        },
+        "PY": {
+            "compute": "span",
+            "pattern": "PY"
+        },
+        "P_repeats": {
+            "compute": "repeats",
+            "residues": [
+                "P"
+            ]
+        },
+        "QN_repeats": {
+            "compute": "repeats",
+            "residues": [
+                "Q",
+                "N"
+            ]
+        },
+        "Q_repeats": {
+            "compute": "repeats",
+            "residues": [
+                "Q"
+            ]
+        },
+        "REP_RGG": {
+            "compute": "span",
+            "pattern": "RGG"
+        },
+        "RG_repeats": {
+            "compute": "repeats",
+            "residues": [
+                "R",
+                "G"
+            ]
+        },
+        "RK_ratio": {
+            "compute": "log_ratio",
+            "denominator": "K",
+            "numerator": "R"
+        },
+        "R_plus_Y": {
+            "compute": "span",
+            "pattern": "[RY]"
+        },
+        "R_repeats": {
+            "compute": "repeats",
+            "residues": [
+                "R"
+            ]
+        },
+        "SGFYSG": {
+            "compute": "span",
+            "pattern": "[SG][FY][SG]"
+        },
+        "SG_repeats": {
+            "compute": "repeats",
+            "residues": [
+                "S",
+                "G"
+            ]
+        },
+        "SR_repeats": {
+            "compute": "repeats",
+            "residues": [
+                "S",
+                "R"
+            ]
+        },
+        "S_repeats": {
+            "compute": "repeats",
+            "residues": [
+                "S"
+            ]
+        },
+        "TRG_ER_FFAT_1": {
+            "compute": "count",
+            "pattern": "[EDS].{0,4}[ED][FY][FYKREM][DE][AC].{1,2}[EDST]"
+        },
+        "TRG_ER_diArg_1": {
+            "compute": "count",
+            "pattern": "([LIVMFYWPR]R[^YFWDE]{0,1}R)|(R[^YFWDE]{0,1}R[LIVMFYWPR])"
+        },
+        "TRG_LysEnd_APsAcLL_1": {
+            "compute": "count",
+            "pattern": "[DERQ]...L[LVI]"
+        },
+        "TRG_NES_CRM1_1": {
+            "compute": "count",
+            "pattern": "([DEQ].{0,1}[LIM].{2,3}[LIVMF][^P]{2,3}[LMVF].[LMIV].{0,3}[DE])|([DE].{0,1}[LIM].{2,3}[LIVMF][^P]{2,3}[LMVF].[LMIV].{0,3}[DEQ])"
+        },
+        "TRG_NLS_MonoExtN_4": {
+            "compute": "count",
+            "pattern": "(([PKR].{0,1}[^DE])|([PKR]))((K[RK])|(RK))(([^DE][KR])|([KR][^DE]))[^DE]"
+        },
+        "acidic": {
+            "compute": "percent_res_group",
+            "residue_group": "acidic"
+        },
+        "aliphatic": {
+            "compute": "percent_res_group",
+            "residue_group": "aliphatic"
+        },
+        "aromatic": {
+            "compute": "percent_res_group",
+            "residue_group": "aromatic"
+        },
+        "basic": {
+            "compute": "percent_res_group",
+            "residue_group": "basic"
+        },
+        "chain_expanding": {
+            "compute": "percent_res_group",
+            "residue_group": "chain_expanding"
+        },
+        "complexity": {
+            "compute": "sequence_complexity"
+        },
+        "custom_kappa": {
+            "compute": "custom_kappa"
+        },
+        "custom_omega": {
+            "compute": "simple_spacing",
+            "residue_group": "pro_charged"
+        },
+        "disorder_promoting": {
+            "compute": "percent_res_group",
+            "residue_group": "disorder_promoting"
+        },
+        "fcr": {
+            "compute": "percent_res_group",
+            "residue_group": "charged"
+        },
+        "isoelectric_point": {
+            "compute": "isoelectric_point"
+        },
+        "net_charge": {
+            "compute": "score",
+            "take_average": false,
+            "score": {
+                "D": -1,
+                "E": -1,
+                "K": 1,
+                "R": 1
+            }
+        },
+        "polar_fraction": {
+            "compute": "percent_res_group",
+            "residue_group": "polar_fraction"
+        }
+    },
+    "residue_groups": {
+        "acidic": [
+            "D",
+            "E"
+        ],
+        "aliphatic": [
+            "A",
+            "L",
+            "M",
+            "I",
+            "V"
+        ],
+        "aromatic": [
+            "F",
+            "Y",
+            "W"
+        ],
+        "basic": [
+            "R",
+            "K"
+        ],
+        "chain_expanding": [
+            "D",
+            "E",
+            "K",
+            "R",
+            "P"
+        ],
+        "charged": [
+            "D",
+            "E",
+            "K",
+            "R"
+        ],
+        "disorder_promoting": [
+            "T",
+            "A",
+            "G",
+            "R",
+            "D",
+            "H",
+            "Q",
+            "K",
+            "S",
+            "E",
+            "P"
+        ],
+        "polar_fraction": [
+            "Q",
+            "N",
+            "S",
+            "T",
+            "G",
+            "C",
+            "H"
+        ],
+        "pro_charged": [
+            "D",
+            "E",
+            "K",
+            "R",
+            "P"
+        ]
+    }
+}
