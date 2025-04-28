@@ -4,4 +4,5 @@ scikit-learn
 scipy
 tqdm
 pydantic
-benchstuff
+pathos
+tqdm_pathos
